@@ -1,6 +1,7 @@
 using GetFitAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GetFitAPI.Controllers
 {
@@ -13,15 +14,16 @@ namespace GetFitAPI.Controllers
             new Meal(){ MealID = 2 , Calories = 200, MealType = new MealType(){ MealTypeID = 1 , Name = "Dinner"}, Name = "Fries"}
         };
 
-        [Route("GetAll")]
+        [HttpGet("GetAll")]
         public IActionResult Get()
         {
             return Ok(meals);
         }
 
-        public IActionResult GetSingle()
+        [HttpGet("{id}")]
+        public IActionResult GetSingle(int id)
         {
-            return Ok(meals[1]);
+            return Ok(meals.FirstOrDefault(meal => meal.MealID == id));
         }
     }
 }
