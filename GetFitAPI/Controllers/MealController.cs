@@ -1,7 +1,10 @@
 using GetFitAPI.Models;
+using GetFitAPI.Services.MealService;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GetFitAPI.Controllers
 {
@@ -9,21 +12,31 @@ namespace GetFitAPI.Controllers
     [Route("[controller]")]
     public class MealController : ControllerBase
     {
-        private static List<Meal> meals = new List<Meal> {
-            new Meal(){ MealID = 1 , Calories = 100, MealType = new MealType(){ MealTypeID = 1 , Name = "Dinner"}, Name = "Kebabs"},
-            new Meal(){ MealID = 2 , Calories = 200, MealType = new MealType(){ MealTypeID = 1 , Name = "Dinner"}, Name = "Fries"}
-        };
+        private readonly IMealService _mealService;
 
-        [HttpGet("GetAll")]
-        public IActionResult Get()
+        public MealController(IMealService mealService)
         {
-            return Ok(meals);
+            _mealService = mealService;
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetSingle(int id)
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> Get()
         {
-            return Ok(meals.FirstOrDefault(meal => meal.MealID == id));
+            return Ok(await _mealService.GetAllMeals());
+        }
+
+        [HttpGet("{MealId}")]
+        public async Task<IActionResult> GetSingle(int MealId)
+        {
+            var response = await _mealService.GetMealById(MealId);
+
+            return Ok(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddMeal(Meal meal)
+        {
+            return Ok(await _mealService.AddMeal(meal));
         }
     }
 }
